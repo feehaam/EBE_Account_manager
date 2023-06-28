@@ -82,3 +82,4 @@ C:\Users\User\source\repos\EcommerceBackend\obj\Debug\net7.0\EcommerceBackend.ge
 C:\Users\User\source\repos\EcommerceBackend\obj\Debug\net7.0\ref\EcommerceBackend.dll
 C:\Users\User\source\repos\EcommerceBackend\bin\Debug\net7.0\AutoMapper.dll
 C:\Users\User\source\repos\EcommerceBackend\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\User\source\repos\EcommerceBackend\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

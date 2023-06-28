@@ -1,6 +1,7 @@
 ﻿using EcommerceBackend.DTO;
 using EcommerceBackend.IServices;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceBackend.Controllers.Accounts
@@ -11,10 +12,12 @@ namespace EcommerceBackend.Controllers.Accounts
     {
 
         private readonly IUserCrud _userCrud;
+        private readonly Itokens _tokens;
 
-        public CreateAccountController(IUserCrud userCrud)
+        public CreateAccountController(IUserCrud userCrud, Itokens tokens)
         {
             _userCrud = userCrud;
+            _tokens = tokens;
         }
 
         [HttpPost("/signup")]
@@ -37,6 +40,18 @@ namespace EcommerceBackend.Controllers.Accounts
             {
                 return BadRequest(result);
             }
+        }
+
+        [HttpPost("/get_email_token")]
+        public async Task<IActionResult> VerifyEmail(string email)
+        {
+            var token = await _tokens.GetEmailVerificationToken(email);
+            if(token.Equals("Email is already verified."))
+            {
+                return Ok(token);
+            }
+            var confirmationLink = $"{Request.Scheme}://{Request.Host}/confirm_email?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";
+            return Ok(confirmationLink.ToString());
         }
     }
 }

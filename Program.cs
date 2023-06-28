@@ -3,8 +3,11 @@ using EcommerceBackend.Helpers;
 using EcommerceBackend.IServices;
 using EcommerceBackend.Models;
 using EcommerceBackend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +20,15 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IUserCrud, UserCrud>();
 builder.Services.AddScoped<IUserRoles, UserRoles>();
 builder.Services.AddScoped<IUserCrud, UserCrud>();
+builder.Services.AddScoped<Itokens, Tokens>();
+builder.Services.AddScoped<IUserAccount, UserAccount>();
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// Identity
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<DataContext>()
     .AddDefaultTokenProviders();
@@ -34,6 +40,28 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
+});
+
+
+// JWT
+var secretKey = builder.Configuration.GetSection("JwtSettings").GetValue<string>("SecretKey");
+var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = false,
+        ValidIssuer = builder.Configuration.GetSection("JwtSettings").GetValue<string>("Issuer"),
+        ValidAudience = builder.Configuration.GetSection("JwtSettings").GetValue<string>("Audience"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+    };
 });
 
 
