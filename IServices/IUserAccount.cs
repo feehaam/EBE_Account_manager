@@ -7,5 +7,6 @@ namespace EcommerceBackend.IServices
         public Task<Object> Login(SignInDto signDto);
         public Task<string> Logout();
         public Task<string> VerifyEmail(string token, string email);
+        public Task<string> ResetPassword(string email, string token, string password);
     }
 }

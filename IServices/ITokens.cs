@@ -6,5 +6,6 @@ namespace EcommerceBackend.IServices
     {
         public Task<string> GetLoginToken(List<Claim> claims);
         public Task<string> GetEmailVerificationToken(string email);
+        public Task<string> GetForgottenPasswordResetToken(string email);
     }
 }

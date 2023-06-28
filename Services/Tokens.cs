@@ -63,5 +63,16 @@ namespace EcommerceBackend.Services
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             return token;
         }
+
+        public async Task<string> GetForgottenPasswordResetToken(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return "User doesn't exist";
+            }
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            return token;
+        }
     }
 }

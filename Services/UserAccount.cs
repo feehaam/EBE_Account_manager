@@ -77,6 +77,7 @@ namespace EcommerceBackend.Services
             return "Logged out successfully";
         }
 
+
         public async Task<string> VerifyEmail(string token, string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -98,6 +99,25 @@ namespace EcommerceBackend.Services
             else
             {
                 return "Failed to confirm email.";
+            }
+        }
+
+        public async Task<string> ResetPassword(string email, string token, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return "User doesn't exist";
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, token, password);
+            if (result.Succeeded)
+            {
+                return "Password changed successfully";
+            }
+            else
+            {
+                return "Failed to change password";
             }
         }
     }
