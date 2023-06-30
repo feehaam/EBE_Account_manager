@@ -15,9 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IUserCrud, UserCrud>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserRoles, UserRoles>();
 builder.Services.AddScoped<IUserCrud, UserCrud>();
 builder.Services.AddScoped<Itokens, Tokens>();

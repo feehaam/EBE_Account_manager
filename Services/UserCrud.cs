@@ -12,12 +12,15 @@ namespace EcommerceBackend.Services
         private UserManager<User> _userManager;
         private RoleManager<IdentityRole> _roleManager;
         private IUserRoles _userRoles;
+        private Itokens _tokens;
 
-        public UserCrud(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IUserRoles userRoles)
+        public UserCrud(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, 
+            IUserRoles userRoles, Itokens tokens)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _userRoles = userRoles;
+            _tokens = tokens;
         }
 
         async public Task<Object> Create(CreateUserDto userDto)
@@ -52,7 +55,7 @@ namespace EcommerceBackend.Services
             }
             else
             {
-                return result;
+                return "Please check your email to confirm account";
             }
         }
 

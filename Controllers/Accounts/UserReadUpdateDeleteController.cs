@@ -31,7 +31,7 @@ namespace EcommerceBackend.Controllers.Accounts
             return Ok(result);
         }
 
-        [HttpPut("/user/delete")]
+        [HttpDelete("/user/delete")]
         public async Task<IActionResult> DeleteUser(string email)
         {
             var result = await _userCrud.Delete(email);

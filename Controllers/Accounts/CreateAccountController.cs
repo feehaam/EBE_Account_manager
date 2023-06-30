@@ -28,7 +28,8 @@ namespace EcommerceBackend.Controllers.Accounts
             {
                 if ((int)result == 1)
                 {
-                    return Ok("Account created succesfully.");
+                    await _tokens.GetEmailVerificationToken(userDto.Email);
+                    return Ok("Account created succesfully. Check your email for account verification link.");
                 }
                 else if ((int)result == 2)
                 {
@@ -45,13 +46,12 @@ namespace EcommerceBackend.Controllers.Accounts
         [HttpPost("/get_email_token")]
         public async Task<IActionResult> VerifyEmail(string email)
         {
-            var token = await _tokens.GetEmailVerificationToken(email);
-            if(token.Equals("Email is already verified."))
+            var result = await _tokens.GetEmailVerificationToken(email);
+            if(result.Equals("Email is already verified."))
             {
-                return Ok(token);
+                return BadRequest(result);
             }
-            var confirmationLink = $"{Request.Scheme}://{Request.Host}/confirm_email?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";
-            return Ok(confirmationLink.ToString());
+            return Ok(result);
         }
     }
 }

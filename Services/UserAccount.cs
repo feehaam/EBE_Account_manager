@@ -31,10 +31,10 @@ namespace EcommerceBackend.Services
                 return "User doesn't exist.";
             }
 
-            /*if (!await _userManager.IsEmailConfirmedAsync(user))
+            if (!await _userManager.IsEmailConfirmedAsync(user))
             {
                 return "Email not verified. Please verify your email before logging in.";
-            }*/
+            }
 
             var signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, true, lockoutOnFailure: false);
 

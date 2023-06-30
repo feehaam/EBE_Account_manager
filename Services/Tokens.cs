@@ -15,16 +15,21 @@ namespace EcommerceBackend.Services
         private string _audience;
         private string _secretKey;
         private int _expirationInMinutes;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private UserManager<User> _userManager;
+        private IEmailService _emailService;
 
-        public Tokens(IConfiguration configuration, UserManager<User> userManager)
+        public Tokens(IConfiguration configuration, UserManager<User> userManager, 
+            IEmailService emailService, IHttpContextAccessor httpContextAccessor)
         {
             _issuer = configuration.GetValue<string>("JwtSettings:Issuer");
             _audience = configuration.GetValue<string>("JwtSettings:Audience");
             _secretKey = configuration.GetValue<string>("JwtSettings:SecretKey");
             _expirationInMinutes = configuration.GetValue<int>("JwtSettings:ExpirationInMinutes");
             _userManager = userManager;
+            _emailService = emailService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<string> GetLoginToken(List<Claim> claims)
@@ -61,7 +66,19 @@ namespace EcommerceBackend.Services
             }
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            return token;
+
+            var request = _httpContextAccessor.HttpContext.Request;
+            var baseUri = $"{request.Scheme}://{request.Host}";
+            var confirmationLink = $"{baseUri}/confirm_email?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";
+
+            _emailService.SentMail(
+                email: user.Email,
+                subject: "Confirm your account.",
+                body: "Hello " + user.FirstName + " " + user.LastName + ", Please click the link below to " +
+                      "confirm your account at Feehams ecommerce website. \n" + confirmationLink
+            );
+
+            return "Check your email for the verification link.";
         }
 
         public async Task<string> GetForgottenPasswordResetToken(string email)
@@ -72,6 +89,16 @@ namespace EcommerceBackend.Services
                 return "User doesn't exist";
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            
+            var changePasswordLink = $"http://localhost:7108/confirm_email?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";
+
+            _emailService.SentMail(
+                email: user.Email,
+                subject: "Reset password.",
+                body: "Hello " + user.FirstName + " " + user.LastName + ", Please use to token below to " +
+                "change your password at Feehams eccomerce web site. \n" + changePasswordLink
+                );
+
             return token;
         }
     }
